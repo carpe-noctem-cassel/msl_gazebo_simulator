@@ -5,7 +5,7 @@ field:
   robot_prefix: "bot"            # use this mark to represent black obstacles
   
 nubot:
-  number: 1                      # number of nubots spawned
+  number: 1                     # number of nubots spawned
   max_linear_vel: 3.0            # default nubot linear velocity (m/s)
   max_angular_vel: 120.0         # default nubot angular velocity (degree/s)
   distance_thres: 0.50           # theshold distance between nubot and football below which dribble ball

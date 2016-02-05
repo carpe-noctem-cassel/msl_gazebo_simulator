@@ -46,11 +46,11 @@
       </camera>
     </gui>
     
-<!-- physics -->
+<!-- physics realtime update rate was 150 befor-->
      <physics type='ode'>
-      <max_step_size>0.007</max_step_size>
+      <max_step_size>0.01</max_step_size>
       <real_time_factor>1</real_time_factor>
-      <real_time_update_rate>150</real_time_update_rate>
+      <real_time_update_rate>100</real_time_update_rate>
       <gravity>0 0 -9.8</gravity>
     </physics>
     

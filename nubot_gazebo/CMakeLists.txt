@@ -11,6 +11,7 @@ find_package(catkin REQUIRED COMPONENTS
   gazebo_ros  
   nubot_common
   dynamic_reconfigure
+  msl_actuator_msgs
 )
 
 find_package(Protobuf REQUIRED)

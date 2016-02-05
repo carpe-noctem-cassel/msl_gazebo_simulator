@@ -17,6 +17,8 @@
   <build_depend>nubot_common</build_depend>
   <build_depend>dynamic_reconfigure</build_depend>
   <build_depend>std_msgs</build_depend>
+  <build_depend>msl_actuator_msgs</build_depend>
+  
   
   <run_depend>gazebo_ros</run_depend>
   <run_depend>rospy</run_depend>
@@ -27,6 +29,7 @@
   <run_depend>nubot_common</run_depend>
   <run_depend>dynamic_reconfigure</run_depend>
   <run_depend>std_msgs</run_depend>
+  <run_depend>msl_actuator_msgs</run_depend>
 
   <export>
 		<!--gazebo_ros gazebo_model_path="${prefix}/../nubot_description/models" /-->

@@ -15,6 +15,7 @@
 #include "nubot_common/VelCmd.h"
 #include "nubot_common/Shoot.h"
 #include "nubot_common/BallHandle.h"
+#include <msl_actuator_msgs/MotionControl.h>
 
 #include <ros/ros.h>
 #include <boost/thread.hpp>
@@ -80,6 +81,7 @@ namespace gazebo{
         ros::NodeHandle*            rosnode_;           // A pointer to the ROS node. 
         ros::Subscriber             ModelStates_sub_;
         ros::Subscriber             Velcmd_sub_;
+        ros::Subscriber             CNC_Velcmd_sub_;
         ros::ServiceServer          ballhandle_server_;
         ros::ServiceServer          shoot_server_;
 
@@ -153,6 +155,10 @@ namespace gazebo{
         /// \brief VelCmd message callback function
         /// \param[in] cmd VelCmd msg shared pointer
         void vel_cmd_CB(const nubot_common::VelCmd::ConstPtr& cmd);
+
+        /// \brief MotionControl message callback function (Carpe Noctem Cassel)
+        /// \param[in] mc MotionControl msg shared pointer
+        void cnc_vel_cmd_CB(const msl_actuator_msgs::MotionControl::ConstPtr& mc);
 
         /// \brief Ball handling service server function
         /// \param[in] req ball handle service request
