@@ -65,7 +65,8 @@ namespace msl_gazebo_control
 		// replace with service stuff
 		ros::Publisher robotCommandPub;
 		ros::ServiceClient robotSpawnServiceClient;
-
+		ros::ServiceClient robotDeleteServiceClient;
+		std::string model_xml;
 
 	};
 

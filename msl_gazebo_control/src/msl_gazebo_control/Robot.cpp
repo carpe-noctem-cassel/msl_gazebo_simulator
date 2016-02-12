@@ -10,6 +10,7 @@
 #include <ros/ros.h>
 #include <process_manager/RobotExecutableRegistry.h>
 #include <gazebo_msgs/SpawnModel.h>
+#include <gazebo_msgs/DeleteModel.h>
 
 #include "msl_gazebo_control/RobotCommand.h"
 #include "msl_gazebo_control/RobotsControl.h"
@@ -18,6 +19,8 @@
 
 #include <chrono>
 #include <limits.h>
+#include <fstream>
+#include <iostream>
 
 namespace msl_gazebo_control
 {
@@ -40,10 +43,14 @@ namespace msl_gazebo_control
 		// add to parent widget
 		this->parentRobotsControl->robotControlWidget_.allRobotsFlowLayout->addWidget(this->widget);
 
-		// TODO: replace with service stuff
+
 		robotSpawnServiceClient = this->parentRobotsControl->rosNode->serviceClient<gazebo_msgs::SpawnModel>(
 				"/gazebo/spawn_sdf_model");
-		//this->robotCommandPub = this->parentRobotsControl->rosNode->advertise<msl_gazebo_control::RobotCommand>("RobotCommand",5);
+		robotDeleteServiceClient = this->parentRobotsControl->rosNode->serviceClient<gazebo_msgs::DeleteModel>(
+				"/gazebo/delete_model");
+
+		ifstream in("/home/emmeda/Research/dev/mslws/src/msl_gazebo_simulator/nubot_description/models/nubot/model.sdf");
+		model_xml = string((std::istreambuf_iterator<char>(in)), std::istreambuf_iterator<char>());
 	}
 
 	Robot::~Robot()
@@ -74,21 +81,32 @@ namespace msl_gazebo_control
 			srv.request.initial_pose.position.z = 0;
 			srv.request.model_name = this->name;
 			srv.request.reference_frame = "world";
-			srv.request.model_xml =
-					"/home/emmeda/Research/dev/mslws/src/msl_gazebo_simulator/nubot_description/models/nubot/model.sdf";
+			// TODO read in the whole document
+			srv.request.model_xml = this->model_xml;
+
 			if (this->robotSpawnServiceClient.call(srv))
 			{
-				cout << "Robot: Call Response: " << srv.response.status_message << endl;
-				cout << "Robot: Call Success: " << srv.response.success << endl;
+				cout << this->name << ": Spawn Model Response: " << srv.response.status_message << endl;
+				cout << this->name << ": Spawn Model Success? - " << (srv.response.success ? "True" : "False") << endl;
 			}
 			else
 			{
-				cout << "Robot: Call didn't work!" << endl;
+				cout << this->name << ": Spawn Model Call didn't work!" << endl;
 			}
 		}
 		else
 		{ // destroy model
-
+			gazebo_msgs::DeleteModel srv;
+			srv.request.model_name = this->name;
+			if (this->robotDeleteServiceClient.call(srv))
+			{
+				cout << this->name << ": Delete Model Response: " << srv.response.status_message << endl;
+				cout << this->name << ": Delete Model Success? - " << (srv.response.success ? "True" : "False") << endl;
+			}
+			else
+			{
+				cout << this->name << ": Delete Model Call didn't work!" << endl;
+			}
 		}
 
 	}

@@ -56,20 +56,10 @@ namespace msl_gazebo_control
 		ros::NodeHandle* rosNode;
 
 	private:
-		ros::Subscriber processStateSub;
-		ros::Subscriber alicaInfoSub;
-
 		supplementary::SystemConfig* sc;
 
 		map<int, Robot*> controlledRobotsMap;
-		queue<pair<chrono::system_clock::time_point, process_manager::ProcessStatsConstPtr>> processStatMsgQueue;
-		mutex processStatsMsgQueueMutex;
-		queue<pair<chrono::system_clock::time_point, alica_ros_proxy::AlicaEngineInfoConstPtr>> alicaInfoMsgQueue;
-		mutex alicaInfoMsgQueueMutex;
 
-		void receiveProcessStats(process_manager::ProcessStatsConstPtr processStats);
-		void receiveAlicaInfo(alica_ros_proxy::AlicaEngineInfoConstPtr alicaInfo);
-		void processMessages();
 		void checkAndInit(int robotId);
 
 		QTimer* guiUpdateTimer;

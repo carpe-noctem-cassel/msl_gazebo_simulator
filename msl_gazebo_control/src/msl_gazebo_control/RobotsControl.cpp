@@ -52,12 +52,6 @@ namespace msl_gazebo_control
 		}
 		context.addWidget(widget_);
 
-		// Initialise the ROS Communication
-		processStateSub = rosNode->subscribe("/process_manager/ProcessStats", 10, &RobotsControl::receiveProcessStats,
-												(RobotsControl*)this);
-		alicaInfoSub = rosNode->subscribe("/AlicaEngine/AlicaEngineInfo", 10, &RobotsControl::receiveAlicaInfo,
-											(RobotsControl*)this);
-
 		// Initialise the GUI refresh timer
 		this->guiUpdateTimer = new QTimer();
 		QObject::connect(guiUpdateTimer, SIGNAL(timeout()), this, SLOT(run()));
@@ -104,7 +98,6 @@ namespace msl_gazebo_control
 	 */
 	void RobotsControl::run()
 	{
-		processMessages();
 
 		updateGUI();
 	}
@@ -120,50 +113,6 @@ namespace msl_gazebo_control
 		{
 			controlledRobotEntry.second->updateGUI(now);
 		}
-	}
-
-	void RobotsControl::receiveProcessStats(process_manager::ProcessStatsConstPtr processStats)
-	{
-		lock_guard<mutex> lck(processStatsMsgQueueMutex);
-		this->processStatMsgQueue.emplace(chrono::system_clock::now(), processStats);
-	}
-
-	void RobotsControl::receiveAlicaInfo(alica_ros_proxy::AlicaEngineInfoConstPtr alicaInfo)
-	{
-		lock_guard<mutex> lck(alicaInfoMsgQueueMutex);
-		this->alicaInfoMsgQueue.emplace(chrono::system_clock::now(), alicaInfo);
-	}
-
-	/**
-	 * Processes all queued messages from the processStatMsgsQueue and the alicaInfoMsgQueue.
-	 */
-	void RobotsControl::processMessages()
-	{
-		{
-			lock_guard<mutex> lck(processStatsMsgQueueMutex);
-			while (!this->processStatMsgQueue.empty())
-			{
-				// unqueue the ROS process stat message
-				auto timePstsPair = processStatMsgQueue.front();
-				processStatMsgQueue.pop();
-
-				this->checkAndInit(timePstsPair.second->senderId);
-			}
-		}
-
-		{
-			lock_guard<mutex> lck(alicaInfoMsgQueueMutex);
-			while (!this->alicaInfoMsgQueue.empty())
-			{
-				// unqueue the ROS alica info message
-				auto timeAlicaInfoPair = alicaInfoMsgQueue.front();
-				alicaInfoMsgQueue.pop();
-
-				this->checkAndInit(timeAlicaInfoPair.second->senderID);
-				this->controlledRobotsMap[timeAlicaInfoPair.second->senderID]->handleAlicaInfo(timeAlicaInfoPair.second);
-			}
-		}
-
 	}
 
 	/**
@@ -192,8 +141,6 @@ namespace msl_gazebo_control
 
 	void RobotsControl::shutdownPlugin()
 	{
-		this->processStateSub.shutdown();
-		this->alicaInfoSub.shutdown();
 	}
 
 	void RobotsControl::saveSettings(qt_gui_cpp::Settings& plugin_settings,
