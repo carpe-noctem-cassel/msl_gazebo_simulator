@@ -36,7 +36,7 @@
   </light>
 
 <!-- gui -->
-    <gui fullscreen='0'>
+    <gui>
       <camera name='user_camera'>
         <pose>0 -16 10 0 0.53 1.57</pose>
         <view_controller>orbit</view_controller>

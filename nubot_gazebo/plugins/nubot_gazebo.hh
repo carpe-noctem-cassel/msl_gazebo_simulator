@@ -16,6 +16,8 @@
 #include "nubot_common/Shoot.h"
 #include "nubot_common/BallHandle.h"
 #include <msl_actuator_msgs/MotionControl.h>
+#include <msl_actuator_msgs/KickControl.h>
+#include <msl_actuator_msgs/ShovelSelectCmd.h>
 
 #include <ros/ros.h>
 #include <boost/thread.hpp>
@@ -82,8 +84,10 @@ namespace gazebo{
         ros::Subscriber             ModelStates_sub_;
         ros::Subscriber             Velcmd_sub_;
         ros::Subscriber             CNC_Velcmd_sub_;
-        ros::ServiceServer          ballhandle_server_;
-        ros::ServiceServer          shoot_server_;
+        ros::Subscriber 			CNC_kick_sub_;
+        ros::Subscriber 			CNC_shovel_sub_;
+//        ros::ServiceServer          ballhandle_server_;
+//        ros::ServiceServer          shoot_server_;
 
         boost::thread               message_callback_queue_thread_;     // Thead object for the running callback Thread.
         boost::thread               service_callback_queue_thread_;
@@ -139,6 +143,7 @@ namespace gazebo{
         bool                        is_hold_ball_;
         bool                        ball_decay_flag_;
         int                         count_;
+        int 						iterSinceShoot;
 
         nubot_state                 state_;
         nubot_substate              sub_state_;
@@ -146,7 +151,7 @@ namespace gazebo{
         nubot::ParaTrajPlanning   traj_plan_linear_;
         nubot::ParaTrajPlanning   traj_plan_rot_;
         math::Rand                  rand_;
-        dynamic_reconfigure::Server<nubot_gazebo::NubotGazeboConfig> *reconfigureServer_;
+//        dynamic_reconfigure::Server<nubot_gazebo::NubotGazeboConfig> *reconfigureServer_;
 
         /// \brief ModelStates message callback function
         /// \param[in] _msg model_states msg shared pointer
@@ -160,17 +165,15 @@ namespace gazebo{
         /// \param[in] mc MotionControl msg shared pointer
         void cnc_vel_cmd_CB(const msl_actuator_msgs::MotionControl::ConstPtr& mc);
 
+        void cnc_on_shovelSelect(const msl_actuator_msgs::ShovelSelectCmd::ConstPtr& mc);
+
+        void cnc_on_kickControl(const msl_actuator_msgs::KickControl::ConstPtr& mc);
+
         /// \brief Ball handling service server function
         /// \param[in] req ball handle service request
         /// \param[out] res ball handle service response
-        bool ball_handle_control_service(nubot_common::BallHandle::Request  &req,
-                                      nubot_common::BallHandle::Response &res);
-
-        /// \brief Ball shooting service server function
-        /// \param[in] req ball handle service request
-        /// \param[out] res ball handle service response
-        bool shoot_control_servive(nubot_common::Shoot::Request  &req,
-                                 nubot_common::Shoot::Response &res);
+//        bool ball_handle_control_service(nubot_common::BallHandle::Request  &req,
+//                                      nubot_common::BallHandle::Response &res);
 
         /// \brief Custom message callback queue thread
         void message_queue_thread();

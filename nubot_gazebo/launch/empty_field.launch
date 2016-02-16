@@ -16,6 +16,8 @@
     <arg name="paused"	value="false"/>
   </include>
 
+  <node name="spawn_ball" pkg="gazebo_ros" type="spawn_model"
+        args="-file $(find nubot_description)/models/football/model.sdf -sdf -model football -x 1.0 -y 1.0 -z 0.0"/>
 
 </launch>
 

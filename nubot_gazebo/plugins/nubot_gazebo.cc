@@ -62,6 +62,8 @@ NubotGazebo::~NubotGazebo()
 void NubotGazebo::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf)
 {
 	// Get the world name.
+	iterSinceShoot = 1000000000;
+	mode_ = -1;
 	this->world_ = _model->GetWorld();
 	this->nubot_model_ = _model;
 	model_name_ = nubot_model_->GetName();
@@ -117,19 +119,18 @@ void NubotGazebo::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf)
 				&this->message_queue_);
 	this->CNC_Velcmd_sub_ = this->rosnode_->subscribe(so3);
 
-	// Service Servers
-	ros::AdvertiseServiceOptions aso1 = ros::AdvertiseServiceOptions::create<nubot_common::BallHandle>(
-			"BallHandle", boost::bind(&NubotGazebo::ball_handle_control_service, this, _1, _2), ros::VoidPtr(),
-			&this->service_queue_);
-	ballhandle_server_ = this->rosnode_->advertiseService(aso1);
+	ros::SubscribeOptions so4 = ros::SubscribeOptions::create<msl_actuator_msgs::KickControl>(
+					"KickControl", 100, boost::bind(&NubotGazebo::cnc_on_kickControl, this, _1), ros::VoidPtr(),
+					&this->message_queue_);
+	this->CNC_kick_sub_ = this->rosnode_->subscribe(so4);
 
-	ros::AdvertiseServiceOptions aso2 = ros::AdvertiseServiceOptions::create<nubot_common::Shoot>(
-			"Shoot", boost::bind(&NubotGazebo::shoot_control_servive, this, _1, _2), ros::VoidPtr(),
-			&this->service_queue_);
-	shoot_server_ = this->rosnode_->advertiseService(aso2);
+	ros::SubscribeOptions so5 = ros::SubscribeOptions::create<msl_actuator_msgs::ShovelSelectCmd>(
+						"ShovelSelectControl", 100, boost::bind(&NubotGazebo::cnc_on_shovelSelect, this, _1), ros::VoidPtr(),
+						&this->message_queue_);
+	this->CNC_shovel_sub_ = this->rosnode_->subscribe(so5);
 
-	reconfigureServer_ = new dynamic_reconfigure::Server<nubot_gazebo::NubotGazeboConfig>(*this->rosnode_);
-	reconfigureServer_->setCallback(boost::bind(&NubotGazebo::config, this, _1, _2));
+//	reconfigureServer_ = new dynamic_reconfigure::Server<nubot_gazebo::NubotGazeboConfig>(*this->rosnode_);
+//	reconfigureServer_->setCallback(boost::bind(&NubotGazebo::config, this, _1, _2));
 
 	// Custom Callback Queue Thread. Use threads to process message and service callback queue
 	this->message_callback_queue_thread_ = boost::thread(boost::bind(&NubotGazebo::message_queue_thread, this));
@@ -330,6 +331,9 @@ bool NubotGazebo::update_model_info(void)
 		math::Quaternion rotation_quaternion = nubot_state_.pose.orientation;
 		math::Matrix3 RotationMatrix3 = rotation_quaternion.GetAsMatrix3();
 		kick_vector_world_ = RotationMatrix3 * kick_vector_nubot; // vector from nubot origin to kicking mechanism in world frame
+
+		dribble_flag_ = get_is_hold_ball();
+		iterSinceShoot = std::min(++iterSinceShoot, 10000);
 		return 1;
 	}
 	else
@@ -376,30 +380,15 @@ void NubotGazebo::cnc_vel_cmd_CB(const msl_actuator_msgs::MotionControl::ConstPt
 	this->msgCB_lock_.unlock();
 }
 
-bool NubotGazebo::ball_handle_control_service(nubot_common::BallHandle::Request &req,
-												nubot_common::BallHandle::Response &res)
+
+void NubotGazebo::cnc_on_shovelSelect(const msl_actuator_msgs::ShovelSelectCmd::ConstPtr& mc)
 {
 	this->srvCB_lock_.lock();
-
-	dribble_flag_ = req.enable ? 1 : 0;
-	if (dribble_flag_)
-	{
-		if (!get_is_hold_ball()) // when dribble_flag is true, it does not necessarily mean that I can dribble it now.
-		{ // it just means the dribble ball mechanism is working.
-			dribble_flag_ = false;
-			res.BallIsHolding = false;
-		}
-		else
-			res.BallIsHolding = true;
-	}
-	else
-		res.BallIsHolding = get_is_hold_ball();
-
+	mode_ = (mc->passing?-1:1);
 	this->srvCB_lock_.unlock();
-	return true;
 }
 
-bool NubotGazebo::shoot_control_servive(nubot_common::Shoot::Request &req, nubot_common::Shoot::Response &res)
+void NubotGazebo::cnc_on_kickControl(const msl_actuator_msgs::KickControl::ConstPtr& kc)
 {
 	this->srvCB_lock_.lock();
 
@@ -407,19 +396,13 @@ bool NubotGazebo::shoot_control_servive(nubot_common::Shoot::Request &req, nubot
 	{
 		dribble_flag_ = false;
 		shot_flag_ = true;
-		mode_ = (int)req.ShootPos; //TODO: mode:-1,1,others
-		force_ = (double)req.strength; // FIXME: need conversion from force to velocity
-		ROS_INFO("%s shoot_control_service(): ShootPos:%d strength:%f", model_name_.c_str(), mode_, force_);
-		res.ShootIsDone = 1;
-	}
-	else
-	{
-		shot_flag_ = false;
-		res.ShootIsDone = 0;
+		//mode_ = (int)req.ShootPos; //TODO: mode:-1,1,others
+		//mode_ = (int)1; //TODO: mode:-1,1,others
+		force_ = (double)kc->power/240; // FIXME: need conversion from force to velocity
+		std::cout << "KickStrenth: " << force_ << std::endl;
 	}
 
 	this->srvCB_lock_.unlock();
-	return true;
 }
 
 void NubotGazebo::nubot_locomotion(math::Vector3 linear_vel_vector, math::Vector3 angular_vel_vector)
@@ -437,15 +420,18 @@ void NubotGazebo::nubot_locomotion(math::Vector3 linear_vel_vector, math::Vector
 
 void NubotGazebo::kick_ball(int mode, double vel = 20.0)
 {
+	std::cout << "Kick: Velocity: " <<vel <<std::endl;
 	math::Vector3 kick_vector_planar(kick_vector_world_.x, kick_vector_world_.y, 0.0);
 
 	if (mode == RUN)
 	{
 		math::Vector3 vel_vector = kick_vector_planar * vel;
+		std::cout << "Kick: Flat: " << vel_vector.x << ", " << vel_vector.y << ", " << vel_vector.z <<std::endl;
 		set_ball_vel(vel_vector, ball_decay_flag_);
 	}
 	else if (mode == FLY)
 	{
+#if 0
 		/* math formular: y = a*x^2 + b*x + c;
 		 a = -g/(2*vx*vx), c = 0, b = kick_goal_height/D + g*D/(2.0*vx*vx)
 		 mid_point coordinates:[-b/(2*a), (4a*c-b^2)/(4a) ]
@@ -465,9 +451,17 @@ void NubotGazebo::kick_ball(int mode, double vel = 20.0)
 		double b = kick_goal_height / d + g * d / (2.0 * vx * vx);
 
 		math::Vector3 kick_vector(vx * kick_vector_world_.x, vx * kick_vector_world_.y, b * vx);
+		std::cout << "Kick: High: " << kick_vector.x << ", " << kick_vector.y << ", " << kick_vector.z <<std::endl;
 		set_ball_vel(kick_vector, ball_decay_flag_);
-		ROS_INFO("%s crosspoint:(%f %f) vx: %f", model_name_.c_str(), crosspoint.x_, crosspoint.y_, vx);
-		ROS_INFO("kick_vector:%f %f %f", kick_vector.x, kick_vector.y, kick_vector.z);
+#endif
+
+#if 1
+		math::Vector3 kick_vector_high(kick_vector_world_.x, kick_vector_world_.y, 1.0);
+		kick_vector_high = kick_vector_high.Normalize();
+		math::Vector3 vel_vector = kick_vector_high * vel*1.4;
+		std::cout << "Kick: High: " << vel_vector.x << ", " << vel_vector.y << ", " << vel_vector.z <<std::endl;
+		set_ball_vel(vel_vector, ball_decay_flag_);
+#endif
 	}
 	else
 	{
@@ -478,6 +472,11 @@ void NubotGazebo::kick_ball(int mode, double vel = 20.0)
 bool NubotGazebo::get_is_hold_ball(void)
 {
 #if 1
+	if (iterSinceShoot < 100)
+	{
+		return false;
+	}
+
 	bool near_ball, allign_ball;
 	double angle_error_degree;
 	math::Vector3 norm = nubot_football_vector_;
@@ -490,6 +489,7 @@ bool NubotGazebo::get_is_hold_ball(void)
 			(angle_error_degree <= dribble_angle_thres_ / 2.0 && angle_error_degree >= -dribble_angle_thres_ / 2.0) ?
 					1 : 0;
 	near_ball = nubot_football_vector_length_ <= dribble_distance_thres_ ? 1 : 0;
+
 	return (near_ball && allign_ball);
 #endif
 }
@@ -594,7 +594,7 @@ bool NubotGazebo::get_trans_vector(math::Vector3 target_point_world, double metr
 void NubotGazebo::dribble_ball(void)
 {
 // There are two ways of ball-dribbling: 1. Set pose; 2. Set tangential velocity 3. Set secant velocity
-#if 0   // 1. Set pose
+#if 1   // 1. Set pose
 	math::Quaternion target_rot = nubot_model_->GetWorldPose().rot;
 	math::Matrix3 RotationMatrix3 = target_rot.GetAsMatrix3();
 	kick_vector_world_ = RotationMatrix3 * kick_vector_nubot;
@@ -606,7 +606,7 @@ void NubotGazebo::dribble_ball(void)
 	football_state_.twist.linear = nubot_state_.twist.linear;
 #endif
 
-#if 1   // 2. Set tangential velocity
+#if 0   // 2. Set tangential velocity
 	static const double desired_bot_ball_len = dribble_distance_thres_;
 
 	math::Vector3 actual_nubot_linvel = nubot_state_.twist.linear;
@@ -675,14 +675,15 @@ void NubotGazebo::nubot_be_control(void)
 	{
 		if (dribble_flag_) // dribble_flag_ is set by BallHandle service
 		{
-			ROS_ERROR("%s is calling dribble_ball() in nubot_gazebo", model_name_.c_str());
+			//ROS_ERROR("%s is calling dribble_ball() in nubot_gazebo", model_name_.c_str());
 			dribble_ball();
 		}
 
 		if (shot_flag_)
 		{
-			ROS_ERROR("%s is callling kick_ball() in nubot_gazebo", model_name_.c_str());
+			//ROS_ERROR("%s is callling kick_ball() in nubot_gazebo", model_name_.c_str());
 			kick_ball(mode_, force_);
+			iterSinceShoot = 0;
 			shot_flag_ = false;
 		}
 	}

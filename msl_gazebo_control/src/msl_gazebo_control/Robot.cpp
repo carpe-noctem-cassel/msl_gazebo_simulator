@@ -8,6 +8,7 @@
 #include <msl_gazebo_control/Robot.h>
 
 #include <ros/ros.h>
+#include <ros/package.h>
 #include <process_manager/RobotExecutableRegistry.h>
 #include <gazebo_msgs/SpawnModel.h>
 #include <gazebo_msgs/DeleteModel.h>
@@ -49,7 +50,9 @@ namespace msl_gazebo_control
 		robotDeleteServiceClient = this->parentRobotsControl->rosNode->serviceClient<gazebo_msgs::DeleteModel>(
 				"/gazebo/delete_model");
 
-		ifstream in("/home/emmeda/Research/dev/mslws/src/msl_gazebo_simulator/nubot_description/models/nubot/model.sdf");
+		string path = ros::package::getPath("nubot_description");
+		cout << "msl_gazebo_control: Path to nubot_descritpion " << path << endl;
+		ifstream in(path + "/models/nubot/model.sdf");
 		model_xml = string((std::istreambuf_iterator<char>(in)), std::istreambuf_iterator<char>());
 	}
 
