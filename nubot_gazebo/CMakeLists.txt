@@ -39,7 +39,7 @@ add_library(nubot_gazebo plugins/nubot_gazebo.cc
                          plugins/nubot_PID.cc
                          plugins/parabolic_transition_planning.cc)
 target_link_libraries(nubot_gazebo ${catkin_LIBRARIES} ${GAZEBO_LIBRARIES} ${Boost_LIBRARIES} ${PROTOBUF_LIBRARIES} pthread)
-add_dependencies(nubot_gazebo ${PROJECT_NAME}_gencfg)
+add_dependencies(nubot_gazebo ${PROJECT_NAME}_gencfg nubot_common_generate_messages_cpp)
 
 add_executable(nubot_teleop_keyboard plugins/nubot_teleop_keyboard.cc)
 target_link_libraries(nubot_teleop_keyboard ${catkin_LIBRARIES})
