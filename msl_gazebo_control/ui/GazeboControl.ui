@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>RobotControlWidget</class>
- <widget class="QWidget" name="RobotControlWidget">
+ <class>GazeboControlWidget</class>
+ <widget class="QWidget" name="GazeboControlWidget">
   <property name="enabled">
    <bool>true</bool>
   </property>
@@ -67,7 +67,7 @@
         <height>105</height>
        </rect>
       </property>
-      <layout class="flowlayout" name="allRobotsFlowLayout">
+      <layout class="flowlayout" name="allButtonsFlowLayout">
        <property name="leftMargin">
         <number>0</number>
        </property>

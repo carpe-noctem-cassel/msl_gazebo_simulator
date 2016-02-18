@@ -1,7 +1,7 @@
 <library path="lib/libmsl_gazebo_control">
-  <class name="msl_gazebo_control/RobotsControl" type="msl_gazebo_control::RobotsControl" base_class_type="rqt_gui_cpp::Plugin">
+  <class name="msl_gazebo_control/GazeboControl" type="msl_gazebo_control::GazeboControl" base_class_type="rqt_gui_cpp::Plugin">
     <description>
-      A GUI plugin to control and monitor robots, using ALICA, the Process Manager, and some robot specific things.
+      A GUI plugin to spawn and delete robot models in the msl_gazebo_simulator.
     </description>
     <qtgui>
       <group>
@@ -9,9 +9,9 @@
         <icon type="theme">folder</icon>
         <statustip>Plugins related to robot tools.</statustip>
       </group>
-      <label>Robot Control</label>
-      <icon type="file">resources/Robot-Head.png</icon>
-      <statustip>A GUI plugin for controlling and monitoring robots.</statustip>
+      <label>Gazebo Control</label>
+      <icon type="file">resources/Actions-games-solve-icon.png</icon>
+      <statustip>A GUI plugin to spawn and delete robot models in the msl_gazebo_simulator.</statustip>
     </qtgui>
   </class>
 </library>
