@@ -53,9 +53,9 @@ NubotGazebo::~NubotGazebo()
 	// Disable the queue, meaning any calls to addCallback() will have no effect.
 	this->message_queue_.disable();
 	this->service_queue_.disable();
-	this->message_callback_queue_thread_.join();
-	this->service_callback_queue_thread_.join();
 	this->rosnode_->shutdown();
+	this->message_callback_queue_thread_.join();
+	this->service_callback_queue_thread_.join();;
 	delete this->rosnode_;
 }
 
@@ -213,13 +213,17 @@ void NubotGazebo::message_queue_thread()
 		// the amount of time to wait for a callback to be available before returning.
 		this->message_queue_.callAvailable(ros::WallDuration(timeout));
 	}
+	std::cout << "NG: after while msg thread" << std::endl;
 }
 
 void NubotGazebo::service_queue_thread()
 {
 	static const double timeout = 0.01;
 	while (this->rosnode_->ok())
+	{
 		this->service_queue_.callAvailable(ros::WallDuration(timeout));
+	}
+	std::cout << "NG: after while service thread" << std::endl;
 }
 
 // Actually PID tuning is not useful in this simulation since realistic physics mechanisms are not simulated
