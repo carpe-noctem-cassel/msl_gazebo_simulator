@@ -52,7 +52,7 @@ namespace msl_gazebo_control
 			curBtn->setStyleSheet(GazeboControl::redBackground.c_str());
 			curBtn->setAutoFillBackground(true);
 			curBtn->update();
-			this->gazeboControlWidget_.allButtonsFlowLayout->addWidget(curBtn);
+			this->gazeboControlWidget_.gazeboControlVerticalLayout->addWidget(curBtn);
 			QObject::connect(curBtn, SIGNAL(toggled(bool)), this,
 										SLOT(toggleModel(bool)));
 		}
