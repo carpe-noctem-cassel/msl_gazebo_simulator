@@ -28,7 +28,7 @@
   <property name="windowTitle">
    <string>Robot Control</string>
   </property>
-  <layout class="QVBoxLayout" name="gazeboControlVerticalLayout" stretch="0,0">
+  <layout class="QVBoxLayout" name="gazeboControlVerticalLayout" stretch="0,0,0">
    <property name="spacing">
     <number>0</number>
    </property>
@@ -51,22 +51,11 @@
      </property>
      <layout class="QVBoxLayout" name="obsBoxVLayout">
       <item>
-       <layout class="QHBoxLayout" name="obsControlBox">
-        <item>
-         <widget class="QPushButton" name="addObsBtn">
-          <property name="text">
-           <string>Add Obstacle</string>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QPushButton" name="setAllObsBtn">
-          <property name="text">
-           <string>Set All</string>
-          </property>
-         </widget>
-        </item>
-       </layout>
+       <widget class="QPushButton" name="obsAddBtn">
+        <property name="text">
+         <string>Add Obstacle</string>
+        </property>
+       </widget>
       </item>
      </layout>
     </widget>
@@ -78,7 +67,7 @@
      </property>
      <layout class="QHBoxLayout" name="ballBoxHLayout">
       <item>
-       <widget class="QPushButton" name="ballResetBtn">
+       <widget class="QPushButton" name="ballSetBtn">
         <property name="text">
          <string>Set</string>
         </property>
@@ -105,6 +94,14 @@
        <widget class="QLineEdit" name="ballYEdit"/>
       </item>
      </layout>
+    </widget>
+   </item>
+   <item>
+    <widget class="QGroupBox" name="robotBox">
+     <property name="title">
+      <string>Robots</string>
+     </property>
+     <layout class="QVBoxLayout" name="robotBoxVerticalLayout"/>
     </widget>
    </item>
   </layout>
