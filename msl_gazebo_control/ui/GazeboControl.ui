@@ -9,8 +9,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>190</width>
-    <height>107</height>
+    <width>454</width>
+    <height>202</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -28,7 +28,7 @@
   <property name="windowTitle">
    <string>Robot Control</string>
   </property>
-  <layout class="QVBoxLayout" name="pmControlVerticalLayout" stretch="0">
+  <layout class="QVBoxLayout" name="gazeboControlVerticalLayout" stretch="0,0,0">
    <property name="spacing">
     <number>0</number>
    </property>
@@ -45,54 +45,68 @@
     <number>0</number>
    </property>
    <item>
-    <widget class="QScrollArea" name="scrollArea">
-     <property name="locale">
-      <locale language="English" country="UnitedKingdom"/>
+    <widget class="QGroupBox" name="obsBox">
+     <property name="title">
+      <string>Obstacles</string>
      </property>
-     <property name="frameShape">
-      <enum>QFrame::StyledPanel</enum>
+     <layout class="QVBoxLayout" name="obsBoxVLayout">
+      <item>
+       <widget class="QPushButton" name="obsAddBtn">
+        <property name="text">
+         <string>Add Obstacle</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item>
+    <widget class="QGroupBox" name="ballBox">
+     <property name="title">
+      <string>Ball</string>
      </property>
-     <property name="frameShadow">
-      <enum>QFrame::Sunken</enum>
+     <layout class="QHBoxLayout" name="ballBoxHLayout">
+      <item>
+       <widget class="QPushButton" name="ballSetBtn">
+        <property name="text">
+         <string>Set</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QLabel" name="ballXLbl">
+        <property name="text">
+         <string>X:</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QLineEdit" name="ballXEdit"/>
+      </item>
+      <item>
+       <widget class="QLabel" name="ballYLbl">
+        <property name="text">
+         <string>Y:</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QLineEdit" name="ballYEdit"/>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item>
+    <widget class="QGroupBox" name="robotBox">
+     <property name="title">
+      <string>Robots</string>
      </property>
-     <property name="widgetResizable">
-      <bool>true</bool>
-     </property>
-     <widget class="QWidget" name="scrollAreaWidgetContents">
-      <property name="geometry">
-       <rect>
-        <x>0</x>
-        <y>0</y>
-        <width>188</width>
-        <height>105</height>
-       </rect>
-      </property>
-      <layout class="flowlayout" name="allButtonsFlowLayout">
-       <property name="leftMargin">
-        <number>0</number>
-       </property>
-       <property name="topMargin">
-        <number>0</number>
-       </property>
-       <property name="rightMargin">
-        <number>0</number>
-       </property>
-       <property name="bottomMargin">
-        <number>0</number>
-       </property>
-      </layout>
-     </widget>
+     <layout class="QVBoxLayout" name="robotBoxVerticalLayout"/>
     </widget>
    </item>
   </layout>
  </widget>
  <layoutdefault spacing="0" margin="0"/>
- <customwidgets>
-  <customwidget>
-   <class>flowlayout</class>
-   <extends>QPushButton</extends>
-   <header>msl_gazebo_control/flowlayout.h</header>
-  </customwidget>
- </customwidgets>
+ <resources/>
  <connections/>
 </ui>

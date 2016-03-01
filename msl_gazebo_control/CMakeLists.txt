@@ -18,12 +18,10 @@ endif (${CMAKE_EXTRA_GENERATOR} MATCHES "Eclipse CDT4")
 catkin_python_setup()
 
 set(msl_gazebo_control_SRCS
-  src/msl_gazebo_control/flowlayout.cpp
   src/msl_gazebo_control/GazeboControl.cpp
 )
 
 set(msl_gazebo_control_HDRS
-  include/msl_gazebo_control/flowlayout.h
   include/msl_gazebo_control/GazeboControl.h
 )
 

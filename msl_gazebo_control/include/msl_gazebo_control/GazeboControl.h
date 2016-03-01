@@ -50,16 +50,18 @@ namespace msl_gazebo_control
 		static const string redBackground;
 		static const string greenBackground;
 		static const string grayBackground;
-		string model_xml;
+		string robot_model_xml;
 		QTimer* guiUpdateTimer;
 		ros::ServiceClient robotSpawnServiceClient;
-		ros::ServiceClient robotDeleteServiceClient;
-
-
-
+		ros::Publisher setModelPublisher;
+		map<string,bool> activeRobotsMap;
+		int obsCounter;
 
 	public Q_SLOTS:
-		void toggleModel(bool spawn);
+		void setRobot(bool checked);
+		void setBall(bool checked);
+		void setObstacle(bool checked);
+		void addObstacle(bool checked);
 	};
 
 }
