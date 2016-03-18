@@ -18,6 +18,7 @@
 #include <msl_actuator_msgs/MotionControl.h>
 #include <msl_actuator_msgs/KickControl.h>
 #include <msl_actuator_msgs/ShovelSelectCmd.h>
+#include <std_msgs/Bool.h>
 
 #include <ros/ros.h>
 #include <boost/thread.hpp>
@@ -86,6 +87,7 @@ namespace gazebo{
         ros::Subscriber             CNC_Velcmd_sub_;
         ros::Subscriber 			CNC_kick_sub_;
         ros::Subscriber 			CNC_shovel_sub_;
+        ros::Subscriber				CNC_toggle_message_processing_;
 //        ros::ServiceServer          ballhandle_server_;
 //        ros::ServiceServer          shoot_server_;
 
@@ -135,6 +137,8 @@ namespace gazebo{
         int                         mode_;                      //kick ball mode
         common::Time                last_update_time_;
         
+        bool processMessages; 		// flag, which activates or deactivates message processing
+
         unsigned int                model_count_;                // Number of models
         bool                        dribble_flag_;
         bool                        shot_flag_;
@@ -166,6 +170,8 @@ namespace gazebo{
         void cnc_vel_cmd_CB(const msl_actuator_msgs::MotionControl::ConstPtr& mc);
 
         void cnc_on_shovelSelect(const msl_actuator_msgs::ShovelSelectCmd::ConstPtr& mc);
+
+        void cnc_on_toggle_message_processing(const std_msgs::BoolConstPtr& toggleMsg);
 
         void cnc_on_kickControl(const msl_actuator_msgs::KickControl::ConstPtr& mc);
 

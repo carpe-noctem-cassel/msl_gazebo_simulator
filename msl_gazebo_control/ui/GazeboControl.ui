@@ -45,11 +45,22 @@
     <number>0</number>
    </property>
    <item>
+       <widget class="QPushButton" name="stopSimBtn">
+        <property name="text">
+         <string>Stop Simulator</string>
+        </property>
+        <property name="checkable">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+   <item>
     <widget class="QGroupBox" name="obsBox">
      <property name="title">
       <string>Obstacles</string>
      </property>
      <layout class="QVBoxLayout" name="obsBoxVLayout">
+      
       <item>
        <widget class="QPushButton" name="obsAddBtn">
         <property name="text">

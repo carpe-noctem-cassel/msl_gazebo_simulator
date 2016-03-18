@@ -54,12 +54,14 @@ namespace msl_gazebo_control
 		QTimer* guiUpdateTimer;
 		ros::ServiceClient robotSpawnServiceClient;
 		ros::Publisher setModelPublisher;
+		ros::Publisher stopSimulatorPublisher;
 		map<string,bool> activeRobotsMap;
 		int obsCounter;
 
 	public Q_SLOTS:
 		void setRobot(bool checked);
 		void setBall(bool checked);
+		void stopSim(bool checked);
 		void setObstacle(bool checked);
 		void addObstacle(bool checked);
 	};

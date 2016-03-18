@@ -5,6 +5,7 @@
 #include <gazebo_msgs/SpawnModel.h>
 #include <gazebo_msgs/ModelState.h>
 #include <msl_gazebo_control/GazeboControl.h>
+#include <std_msgs/Bool.h>
 
 #include <SystemConfig.h>
 
@@ -24,6 +25,7 @@ namespace msl_gazebo_control
 
 		robotSpawnServiceClient = this->rosNode->serviceClient<gazebo_msgs::SpawnModel>("/gazebo/spawn_sdf_model");
 		setModelPublisher = this->rosNode->advertise<gazebo_msgs::ModelState>("/gazebo/set_model_state", 10);
+		stopSimulatorPublisher = this->rosNode->advertise<std_msgs::Bool>("/gazebo/stopSimulator", 10);
 
 		string path = ros::package::getPath("nubot_description");
 		cout << "msl_gazebo_control: Path to nubot_descritpion " << path << endl;
@@ -42,6 +44,9 @@ namespace msl_gazebo_control
 			widget_->setWindowTitle(widget_->windowTitle() + " (" + QString::number(context.serialNumber()) + ")");
 		}
 		context.addWidget(widget_);
+
+		// connect ball set button
+		QObject::connect(this->gazeboControlWidget_.stopSimBtn, SIGNAL(toggled(bool)), this, SLOT(stopSim(bool)));
 
 		// connect ball set button
 		QObject::connect(this->gazeboControlWidget_.ballSetBtn, SIGNAL(clicked(bool)), this, SLOT(setBall(bool)));
@@ -244,6 +249,20 @@ namespace msl_gazebo_control
 					this->activeRobotsMap[name] = false;
 				}
 			}
+		}
+	}
+
+
+	void GazeboControl::stopSim(bool checked)
+	{
+		QPushButton* btn = (QPushButton*)QObject::sender();
+		string name = btn->text().toStdString();
+		if (btn == this->gazeboControlWidget_.stopSimBtn)
+		{ // STOP SIM
+			cout << "GC: stopSim(" << checked << ") called from button \"Stop Simulator\"" << endl;
+			std_msgs::Bool toggleMsg;
+			toggleMsg.data = !checked;
+			this->stopSimulatorPublisher.publish(toggleMsg);
 		}
 	}
 
