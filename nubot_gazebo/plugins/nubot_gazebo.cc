@@ -474,7 +474,7 @@ void NubotGazebo::kick_ball(int mode, double vel = 20.0)
 
 	if (mode == RUN)
 	{
-		math::Vector3 vel_vector = kick_vector_planar * vel;
+		math::Vector3 vel_vector = kick_vector_planar * vel*1.4;
 		std::cout << "Kick: Flat: " << vel_vector.x << ", " << vel_vector.y << ", " << vel_vector.z <<std::endl;
 		set_ball_vel(vel_vector, ball_decay_flag_);
 	}
