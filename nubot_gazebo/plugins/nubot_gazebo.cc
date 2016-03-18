@@ -402,7 +402,28 @@ void NubotGazebo::cnc_on_kickControl(const msl_actuator_msgs::KickControl::Const
 		shot_flag_ = true;
 		//mode_ = (int)req.ShootPos; //TODO: mode:-1,1,others
 		//mode_ = (int)1; //TODO: mode:-1,1,others
-		force_ = (double)kc->power/240; // FIXME: need conversion from force to velocity
+
+		// values from kick curve evaluation stuff
+		if (kc->power < 1200)
+		{
+		        double a = 2.2592655783923168E-01;
+                        double b = -1.7011763554649019E+03;
+
+                        double temp = 0.0;
+                        temp += a * sqrt(kc->power);
+                        temp += b / kc->power;
+                        force_ = temp;
+		}
+		else
+		{
+                        double f2 = 350.0;
+                        double f3 = 11.5;
+                        double f4 = 850.0;
+                        force_ = (1 - exp((-(kc->power - f4)) / f2)) * f3;
+		}
+//		force_ = (double)kc->power/240; // FIXME: need conversion from force to velocity
+
+
 		std::cout << "KickStrenth: " << force_ << std::endl;
 	}
 
@@ -462,7 +483,7 @@ void NubotGazebo::kick_ball(int mode, double vel = 20.0)
 #if 1
 		math::Vector3 kick_vector_high(kick_vector_world_.x, kick_vector_world_.y, 1.0);
 		kick_vector_high = kick_vector_high.Normalize();
-		math::Vector3 vel_vector = kick_vector_high * vel*1.4;
+		math::Vector3 vel_vector = kick_vector_high * vel;
 		std::cout << "Kick: High: " << vel_vector.x << ", " << vel_vector.y << ", " << vel_vector.z <<std::endl;
 		set_ball_vel(vel_vector, ball_decay_flag_);
 #endif
