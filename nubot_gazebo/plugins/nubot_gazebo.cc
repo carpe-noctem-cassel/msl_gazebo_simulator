@@ -64,6 +64,7 @@ void NubotGazebo::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf)
 	// Get the world name.
 	iterSinceShoot = 1000000000;
 	mode_ = -1;
+	processMessages = true;
 	this->world_ = _model->GetWorld();
 	this->nubot_model_ = _model;
 	model_name_ = nubot_model_->GetName();
@@ -128,6 +129,11 @@ void NubotGazebo::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf)
 						"ShovelSelectControl", 100, boost::bind(&NubotGazebo::cnc_on_shovelSelect, this, _1), ros::VoidPtr(),
 						&this->message_queue_);
 	this->CNC_shovel_sub_ = this->rosnode_->subscribe(so5);
+
+	ros::SubscribeOptions so6 = ros::SubscribeOptions::create<std_msgs::Bool>(
+							"/gazebo/stopSimulator", 100, boost::bind(&NubotGazebo::cnc_on_toggle_message_processing, this, _1), ros::VoidPtr(),
+							&this->message_queue_);
+	this->CNC_toggle_message_processing_ = this->rosnode_->subscribe(so6);
 
 //	reconfigureServer_ = new dynamic_reconfigure::Server<nubot_gazebo::NubotGazeboConfig>(*this->rosnode_);
 //	reconfigureServer_->setCallback(boost::bind(&NubotGazebo::config, this, _1, _2));
@@ -367,6 +373,9 @@ void NubotGazebo::vel_cmd_CB(const nubot_common::VelCmd::ConstPtr& cmd)
 
 void NubotGazebo::cnc_vel_cmd_CB(const msl_actuator_msgs::MotionControl::ConstPtr& mc)
 {
+	if (!this->processMessages)
+		return;
+
 	this->msgCB_lock_.lock();
 
 	Vx_cmd_ = cos(mc->motion.angle+M_PI)*(mc->motion.translation/1000.0);
@@ -392,8 +401,23 @@ void NubotGazebo::cnc_on_shovelSelect(const msl_actuator_msgs::ShovelSelectCmd::
 	this->srvCB_lock_.unlock();
 }
 
+void NubotGazebo::cnc_on_toggle_message_processing(const std_msgs::BoolConstPtr& toggleMsg)
+{
+	this->msgCB_lock_.lock();
+	processMessages = toggleMsg->data;
+	if (processMessages == false)
+	{
+		nubot_locomotion(math::Vector3(0,0,0), math::Vector3(0,0,0));
+	}
+	this->msgCB_lock_.unlock();
+}
+
+
 void NubotGazebo::cnc_on_kickControl(const msl_actuator_msgs::KickControl::ConstPtr& kc)
 {
+	if (!this->processMessages)
+		return;
+
 	this->srvCB_lock_.lock();
 
 	if (get_is_hold_ball())
