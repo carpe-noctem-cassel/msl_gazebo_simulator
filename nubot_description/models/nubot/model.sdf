@@ -22,7 +22,7 @@
         <pose>0 0 0 0 0 0</pose>
         <geometry>
           <mesh>
-            <scale>1.5 1.5 1.6</scale>
+            <scale>1.2 1.2 1.45</scale>
             <uri>file://meshes/frame_collision.dae</uri>
           </mesh>
         </geometry>
@@ -43,7 +43,7 @@
           <pose>0 0 0 0 0 0</pose>
           <geometry>
             <mesh>
-              <scale>1.5 1.5 1.6</scale>
+              <scale>1.2 1.2 1.45</scale>
               <uri>file://meshes/frame.dae</uri>
             </mesh>
           </geometry>

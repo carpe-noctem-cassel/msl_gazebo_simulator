@@ -226,6 +226,7 @@ namespace msl_gazebo_control
 					srv.request.initial_pose.position.x = 0;
 					srv.request.initial_pose.position.y = 0;
 				}
+
 				srv.request.initial_pose.position.z = 0;
 				srv.request.model_name = name;
 				srv.request.reference_frame = "world";
