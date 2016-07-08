@@ -34,10 +34,6 @@ set(msl_gazebo_control_INCLUDE_DIRECTORIES
   ${CMAKE_CURRENT_BINARY_DIR}
 )
 
-#set(msl_gazebo_control_RCS
-#  resources/resources.qrc
-#)
-
 catkin_package(
   INCLUDE_DIRS ${msl_gazebo_control_INCLUDE_DIRECTORIES}
   LIBRARIES ${PROJECT_NAME}
@@ -46,14 +42,11 @@ catkin_package(
 
 
 qt4_wrap_cpp(msl_gazebo_control_MOCS ${msl_gazebo_control_HDRS})
-#qt4_add_resources(msl_gazebo_control_RESOURCES ${msl_gazebo_control_RCS}) 
 qt4_wrap_ui(msl_gazebo_control_UIS_H ${msl_gazebo_control_UIS})
 
 include_directories(${msl_gazebo_control_INCLUDE_DIRECTORIES} ${catkin_INCLUDE_DIRS})
-add_library(${PROJECT_NAME} ${msl_gazebo_control_SRCS} ${msl_gazebo_control_MOCS} ${msl_gazebo_control_UIS_H})#${msl_gazebo_control_RESOURCES}
+add_library(${PROJECT_NAME} ${msl_gazebo_control_SRCS} ${msl_gazebo_control_MOCS} ${msl_gazebo_control_UIS_H})
 target_link_libraries(${PROJECT_NAME} ${catkin_LIBRARIES} ${QT_QTCORE_LIBRARY} ${QT_QTGUI_LIBRARY} ${QT_QTNETWORK_LIBRARY})
-
-add_dependencies(${PROJECT_NAME} ${catkin_LIBRARIES})
 
 find_package(class_loader)
 class_loader_hide_library_symbols(${PROJECT_NAME})
