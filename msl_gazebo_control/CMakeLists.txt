@@ -4,8 +4,14 @@ project(msl_gazebo_control)
 # Load catkin and all dependencies required for this package
 find_package(catkin REQUIRED COMPONENTS rqt_gui rqt_gui_cpp system_config)
 
-find_package(Qt4 COMPONENTS QtCore QtGui QtNetwork REQUIRED)
-include(${QT_USE_FILE})
+#find_package(Qt4 COMPONENTS QtCore QtGui QtNetwork REQUIRED)
+find_package(Qt5Gui REQUIRED)
+find_package(Qt5Network REQUIRED)
+find_package(Qt5OpenGL REQUIRED)
+find_package(Qt5Core REQUIRED)
+#INCLUDE( ${QT_USE_FILE} ) # adds some useful macros and variables, that contains a path to CMake script
+SET( QT_WRAP_CPP        TRUE )
+SET( QT_USE_QTXML       TRUE )
 
 ## Use c++ 11x std
 set(CMAKE_CXX_FLAGS "-std=c++11 ${CMAKE_CXX_FLAGS}")
@@ -41,12 +47,13 @@ catkin_package(
 )
 
 
-qt4_wrap_cpp(msl_gazebo_control_MOCS ${msl_gazebo_control_HDRS})
-qt4_wrap_ui(msl_gazebo_control_UIS_H ${msl_gazebo_control_UIS})
+QT5_WRAP_UI(msl_gazebo_control_UIS_H ${msl_gazebo_control_UIS})
+QT5_WRAP_CPP(msl_gazebo_control_MOCS ${msl_gazebo_control_HDRS})
 
 include_directories(${msl_gazebo_control_INCLUDE_DIRECTORIES} ${catkin_INCLUDE_DIRS})
 add_library(${PROJECT_NAME} ${msl_gazebo_control_SRCS} ${msl_gazebo_control_MOCS} ${msl_gazebo_control_UIS_H})
-target_link_libraries(${PROJECT_NAME} ${catkin_LIBRARIES} ${QT_QTCORE_LIBRARY} ${QT_QTGUI_LIBRARY} ${QT_QTNETWORK_LIBRARY})
+#target_link_libraries(${PROJECT_NAME} ${catkin_LIBRARIES} ${QT_QTCORE_LIBRARY} ${QT_QTGUI_LIBRARY} ${QT_QTNETWORK_LIBRARY})
+target_link_libraries(${PROJECT_NAME} ${catkin_LIBRARIES}  ${QT_LIBRARIES} ${Qt5Network_LIBRARIES} ${Qt5Core_LIBRARIES} ${Qt5Gui_LIBRARIES} ${Qt5OpenGL_LIBRARIES})
 
 find_package(class_loader)
 class_loader_hide_library_symbols(${PROJECT_NAME})
