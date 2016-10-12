@@ -32,7 +32,7 @@ set(msl_gazebo_control_HDRS
 )
 
 set(msl_gazebo_control_UIS
-  ui/GazeboControl.ui
+  ui/GazeboControl.ui  
 )
 
 set(msl_gazebo_control_INCLUDE_DIRECTORIES
@@ -41,7 +41,7 @@ set(msl_gazebo_control_INCLUDE_DIRECTORIES
 )
 
 catkin_package(
-  INCLUDE_DIRS include ${CMAKE_CURRENT_BINARY_DIR}
+  INCLUDE_DIRS ${msl_gazebo_control_INCLUDE_DIRECTORIES}
   LIBRARIES ${PROJECT_NAME}
   CATKIN_DEPENDS rqt_gui rqt_gui_cpp
 )

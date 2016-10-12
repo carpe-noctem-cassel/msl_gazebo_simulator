@@ -10,13 +10,13 @@ if (${CMAKE_EXTRA_GENERATOR} MATCHES "Eclipse CDT4")
 endif (${CMAKE_EXTRA_GENERATOR} MATCHES "Eclipse CDT4")
 
 # Load catkin and all dependencies required for this package
-find_package(catkin REQUIRED COMPONENTS
+find_package(catkin REQUIRED COMPONENTS 
   rospy
   roscpp
   std_msgs
   geometry_msgs
   sensor_msgs
-  gazebo_ros
+  gazebo_ros  
   nubot_common
   dynamic_reconfigure
   msl_actuator_msgs
@@ -34,12 +34,12 @@ include_directories(${Boost_INCLUDE_DIR} ${catkin_INCLUDE_DIRS} ${GAZEBO_INCLUDE
 message("gazebo include path: ${GAZEBO_INCLUDE_DIRS}")
 
 catkin_package(
-  CATKIN_DEPENDS
+  CATKIN_DEPENDS 
     sensor_msgs
-    gazebo_ros
+    gazebo_ros 
     roscpp
     dynamic_reconfigure
-  DEPENDS
+  DEPENDS 
     gazebo
 )
 
