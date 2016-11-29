@@ -108,6 +108,6 @@
         </material>
       </visual>
     </link>
-
+<!--    <plugin name="msl_gazebo_sim_link"     filename="libmsl_gazebo_sim_link.so"/>-->
   </model>
 </sdf>
