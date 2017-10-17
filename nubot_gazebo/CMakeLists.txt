@@ -20,6 +20,7 @@ find_package(catkin REQUIRED COMPONENTS
   nubot_common
   dynamic_reconfigure
   msl_actuator_msgs
+  agent_id
 )
 
 find_package(Protobuf REQUIRED)
@@ -40,6 +41,7 @@ catkin_package(
     roscpp
     dynamic_reconfigure
     msl_actuator_msgs
+    agent_id
   DEPENDS 
     gazebo
 )
